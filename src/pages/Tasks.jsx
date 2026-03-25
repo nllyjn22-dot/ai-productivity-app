@@ -3,11 +3,11 @@ import { useTasks } from "../context/TaskContext";
 
 function Tasks() {
   const { tasks, addTask, deleteTask, toggleTask } = useTasks();
-
+  const [filter, setFilter] = useState("all");
   const [input, setInput] = useState("");
   const [suggestion, setSuggestion] = useState("");
 
-  // 🔥 SMART SUGGESTION
+  // ✅ SMART SUGGESTION (LOCAL)
   function getSuggestion(text) {
     const lower = text.toLowerCase();
 
@@ -26,32 +26,42 @@ function Tasks() {
     return "";
   }
 
-  // 🔥 TASK BREAKDOWN
+  // ✅ BREAK TASK
   function breakTask(text) {
     if (!text.trim()) return [];
 
     return [text + " - Part 1", text + " - Part 2", text + " - Part 3"];
   }
 
+  // ✅ ADD TASK
   function handleAdd() {
     if (!input.trim()) return;
+
     addTask(input);
     setInput("");
     setSuggestion("");
   }
 
+  // ✅ BREAK TASK BUTTON
   function handleBreakTask() {
+    if (!input.trim()) return;
+
     const parts = breakTask(input);
     parts.forEach((p) => addTask(p));
+
     setInput("");
     setSuggestion("");
   }
-
+  const filteredTasks = tasks.filter((task) => {
+    if (filter === "completed") return task.completed;
+    if (filter === "pending") return !task.completed;
+    return true;
+  });
   return (
     <div className="container">
       <h2 className="title">Tasks</h2>
 
-      {/* INPUT CARD */}
+      {/* INPUT BOX */}
       <div className="card">
         <input
           value={input}
@@ -62,20 +72,30 @@ function Tasks() {
           }}
           placeholder="Enter task..."
         />
-        {tasks.length === 0 && (
-          <p className="empty">No tasks yet. Add something 🚀</p>
-        )}
-        <button onClick={handleAdd}>Add</button>
-        <button onClick={handleBreakTask}>Break Task</button>
 
-        {/* SUGGESTION */}
+        <div className="task-buttons">
+          <button onClick={handleAdd}>Add</button>
+          <button onClick={handleBreakTask}>Break Task</button>
+        </div>
+
         {suggestion && <p className="suggestion">💡 {suggestion}</p>}
       </div>
 
+      {/* EMPTY STATE */}
+      {tasks.length === 0 && (
+        <p className="empty">No tasks yet. Add something 🚀</p>
+      )}
+
       {/* TASK LIST */}
-      {tasks.map((task) => (
+      {filteredTasks.map((task) => (
         <div key={task.id} className="task-item">
-          <span className={task.completed ? "completed" : ""}>{task.text}</span>
+          <span
+            onClick={() => toggleTask(task.id)}
+            className={task.completed ? "completed" : ""}
+            style={{ cursor: "pointer" }}
+          >
+            {task.text}
+          </span>
 
           <div className="task-actions">
             <button onClick={() => toggleTask(task.id)}>
@@ -85,6 +105,11 @@ function Tasks() {
             <button className="delete-btn" onClick={() => deleteTask(task.id)}>
               ❌
             </button>
+            <div className="filters">
+              <button onClick={() => setFilter("all")}>All</button>
+              <button onClick={() => setFilter("completed")}>Completed</button>
+              <button onClick={() => setFilter("pending")}>Pending</button>
+            </div>
           </div>
         </div>
       ))}
