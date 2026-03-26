@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Tasks from "./pages/Tasks";
 import Notes from "./pages/Notes";
@@ -6,7 +6,9 @@ import Focus from "./pages/Focus";
 
 function App() {
   return (
-    <HashRouter>
+    <BrowserRouter>
+      {/* <h1>AI Productivity App</h1> */}
+
       <nav className="navbar">
         <div>AI App</div>
         <div>
@@ -23,9 +25,7 @@ function App() {
         <Route path="/notes" element={<Notes />} />
         <Route path="/focus" element={<Focus />} />
       </Routes>
-      {/* </BrowserRouter> */}
-    </HashRouter>
-    // {/* <h1>AI Productivity App</h1> */}
+    </BrowserRouter>
   );
 }
 
